@@ -1,0 +1,19 @@
+
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+# Skip with git commit -a -m "..." --no-verify
+repos:
+  - repo: local
+    hooks:
+      - id: linter-fix
+        verbose: true
+        pass_filenames: false
+        name: format
+        entry: poe linter-fix
+        language: system
+      - id: poe-check
+        verbose: true
+        pass_filenames: false
+        name: check
+        entry: poe check
+        language: system
