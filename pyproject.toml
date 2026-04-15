@@ -9,6 +9,8 @@ dependencies = [
     "delta-spark==3.1.0",
     "mysql-connector-python>=9.0.0",
     "python-dotenv>=1.0.0",
+    "mcp[cli]>=1.0.0",
+    "duckdb>=0.10.0",
 ]
 
 [dependency-groups]
@@ -27,9 +29,12 @@ check = "ruff check src && pyright src"
 test = "pytest tests/ -v"
 coverage = "pytest tests/ --cov=src --cov-report=term-missing"
 pipeline = "python src/main.py"
-infra-up = "docker compose -f docker/docker-compose.yml up -d"
-infra-down = "docker compose -f docker/docker-compose.yml down"
+mcp = "python src/mcp_server/server.py"
 
 [tool.ruff]
 line-length = 88
 target-version = "py311"
+
+[tool.pyright]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
