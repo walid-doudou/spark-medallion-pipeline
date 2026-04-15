@@ -1,11 +1,9 @@
 # spark-medallion-pipeline
 
-Batch ETL pipeline built with PySpark and Delta Lake, following the Medallion architecture (Bronze / Silver / Gold) — ingesting NYC Taxi data from MySQL to S3.
+Batch ETL pipeline built with PySpark and Delta Lake, following the Medallion architecture (Bronze / Silver / Gold) — ingesting NYC Taxi data from S3.
 
 ## Architecture
 ```
-MySQL (source)
-    ↓  JDBC
 Bronze (raw Delta table on S3)
     ↓
 Silver (cleaned & validated Delta table)
