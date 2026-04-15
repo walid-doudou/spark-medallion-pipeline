@@ -43,7 +43,7 @@ spark-medallion-pipeline/
 git clone https://github.com/<your-username>/spark-medallion-pipeline
 
 # Start the infrastructure
-docker compose -f docker/docker-compose.yml up -d
+docker-compose up -d
 
 # Run the pipeline
 uv run src/main.py
