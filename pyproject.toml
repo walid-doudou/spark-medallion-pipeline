@@ -2,7 +2,7 @@
 name = "spark-medallion-pipeline"
 version = "0.1.0"
 description = "Batch ETL pipeline with PySpark and Delta Lake following the Medallion architecture"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.13"
 
 dependencies = [
     "pyspark==3.5.1",
@@ -25,11 +25,13 @@ dev = [
 
 [tool.poe.tasks]
 linter-fix = "ruff format src"
-check = "ruff check src && pyright src"
+check = {shell = "ruff check src && pyright src"}
 test = "pytest tests/ -v"
 coverage = "pytest tests/ --cov=src --cov-report=term-missing"
 pipeline = "python src/main.py"
 mcp = "python src/mcp_server/server.py"
+infra-up = "docker compose up -d"
+infra-down = "docker compose down"
 
 [tool.ruff]
 line-length = 88
