@@ -1,12 +1,12 @@
-from config.spark_session import get_spark_session
 from pyspark.sql.functions import month
+from pyspark.sql import SparkSession
 
 __all__ = ["bronze_run"]
 
 
-def bronze_run() -> None:
+def bronze_run(spark: SparkSession) -> None:
     """Generate Raw Data"""
-    spark = get_spark_session()
+
     df = spark.read.parquet("data/raw/*.parquet")
 
     df = df.withColumn("month", month("tpep_pickup_datetime"))
