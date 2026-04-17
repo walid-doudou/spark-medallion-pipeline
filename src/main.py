@@ -1,8 +1,17 @@
 from bronze import bronze_run
+from config import get_spark_session
 
 
-def main():
-    bronze_run()
+class Perform():
+    """Run the process 
+    """
     
-if __name__ == "__main__":
-    main()
+    def __init__(self):
+        self.spark = get_spark_session()
+        self.run()
+        
+    def run(self):
+        bronze = bronze_run(self.spark)
+        #silver = silver_run(self.spark)
+        #gold = gold_run(self.spark)
+    

@@ -1,6 +1,8 @@
 from pyspark.sql import SparkSession
 
 
+__all__ = ["get_spark_session"]
+
 def get_spark_session() -> SparkSession:
     return (
         SparkSession.builder.appName("nyc-taxi")  # type: ignore[union-attr]
