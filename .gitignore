@@ -114,3 +114,6 @@ install-dev
 
 # reports
 reports/
+
+# data
+data/raw/*
