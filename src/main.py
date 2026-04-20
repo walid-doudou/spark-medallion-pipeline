@@ -1,7 +1,10 @@
 from bronze import bronze_run
 
-# from silver import silver_run
+from silver import silver_run
 from config import get_spark_session
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 class Perform:
@@ -13,8 +16,8 @@ class Perform:
         self.run()
 
     def run(self) -> None:
-        bronze_run(self.spark, self.df)
-        # silver_run(self.spark, self.df)
+        df_bronze = bronze_run(self.spark, self.df)
+        silver_run(self.spark, df_bronze)
         # gold = gold_run(self.spark)
 
 
