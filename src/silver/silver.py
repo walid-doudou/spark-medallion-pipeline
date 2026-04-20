@@ -27,6 +27,7 @@ def silver_run(spark: SparkSession, df: DataFrame) -> DataFrame:
         .filter(df.fare_amount > 0)
         .filter(df.passenger_count >= 1)
         .filter(df.tpep_dropoff_datetime > df.tpep_pickup_datetime)
+        .filter(df.year.isin("2024"))
         .filter(df.month.isin([1, 2, 3]))
     )
 
