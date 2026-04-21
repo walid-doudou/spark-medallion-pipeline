@@ -20,6 +20,8 @@ def _write_delta(df: DataFrame, path: str) -> None:
 def gold_run(spark: SparkSession, df: DataFrame) -> None:
     """Generate aggregated Gold tables."""
 
+    df = df.cache()
+
     # Total revenue per day
     revenue_by_day = (
         df.groupBy(col("tpep_pickup_datetime").cast("date").alias("date"))
@@ -34,7 +36,7 @@ def gold_run(spark: SparkSession, df: DataFrame) -> None:
         .orderBy("VendorID")
     )
 
-    # Table 3 : nombre de courses par heure
+    # Number of trips per hour
     hourly_trips = (
         df.groupBy(hour("tpep_pickup_datetime").alias("hour"))
         .agg(count("*").alias("trip_count"))
@@ -49,3 +51,5 @@ def gold_run(spark: SparkSession, df: DataFrame) -> None:
 
     _write_delta(hourly_trips, PATH_HOURLY_TRIPS)
     logger.info("Gold table hourly_trips written")
+
+    df.unpersist()
