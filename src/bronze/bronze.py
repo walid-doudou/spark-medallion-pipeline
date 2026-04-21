@@ -1,4 +1,4 @@
-from pyspark.sql.functions import month
+from pyspark.sql.functions import month, year
 from pyspark.sql import SparkSession, DataFrame
 from delta.tables import DeltaTable
 from pyspark.errors import AnalysisException
@@ -14,8 +14,10 @@ PATH = "s3a://nyc-taxi/bronze/trips"
 def bronze_run(spark: SparkSession, df: DataFrame) -> DataFrame:
     """Generate Raw Data [Bronze]"""
 
-    df = df.withColumn("month", month("tpep_pickup_datetime")).dropDuplicates(
-        ["tpep_pickup_datetime", "VendorID", "tpep_dropoff_datetime"]
+    df = (
+        df.withColumn("year", year("tpep_pickup_datetime"))
+        .withColumn("month", month("tpep_pickup_datetime"))
+        .dropDuplicates(["tpep_pickup_datetime", "VendorID", "tpep_dropoff_datetime"])
     )
     try:
         delta_table = DeltaTable.forPath(spark, PATH)

@@ -1,6 +1,7 @@
 from bronze import bronze_run
-
 from silver import silver_run
+from gold import gold_run
+
 from config import get_spark_session
 import logging
 
@@ -17,8 +18,8 @@ class Perform:
 
     def run(self) -> None:
         df_bronze = bronze_run(self.spark, self.df)
-        silver_run(self.spark, df_bronze)
-        # gold = gold_run(self.spark)
+        df_silver = silver_run(self.spark, df_bronze)
+        gold_run(self.spark, df_silver)
 
 
 Perform()
