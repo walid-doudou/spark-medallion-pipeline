@@ -1,54 +1,51 @@
 from pyspark.sql import SparkSession, DataFrame
-from delta.tables import DeltaTable
-from pyspark.errors import AnalysisException
+from pyspark.sql.functions import sum, count, hour, col
 import logging
-
-__all__ = ["gold_run"]
-
-PATH = "s3a://nyc-taxi/silver/trips"
 
 logger = logging.getLogger(__name__)
 
+__all__ = ["gold_run"]
 
-def gold_run(spark: SparkSession, df: DataFrame) -> DataFrame:
-    """Clean and validate data [Gold]"""
+PATH_REVENUE_BY_DAY = "s3a://nyc-taxi/gold/revenue_by_day"
+PATH_REVENUE_BY_VENDOR = "s3a://nyc-taxi/gold/revenue_by_vendor"
+PATH_HOURLY_TRIPS = "s3a://nyc-taxi/gold/hourly_trips"
 
-    df = (
-        df.dropna(
-            subset=[
-                "tpep_pickup_datetime",
-                "tpep_dropoff_datetime",
-                "trip_distance",
-                "fare_amount",
-                "passenger_count",
-            ]
-        )
-        .filter(df.trip_distance > 0)
-        .filter(df.fare_amount > 0)
-        .filter(df.passenger_count >= 1)
-        .filter(df.tpep_dropoff_datetime > df.tpep_pickup_datetime)
-        .filter(df.year.isin("2024"))
-        .filter(df.month.isin([1, 2, 3]))
+
+def _write_delta(df: DataFrame, path: str) -> None:
+    """Write a DataFrame to a Delta table, creating or overwriting."""
+
+    df.write.format("delta").mode("overwrite").save(path)
+
+
+def gold_run(spark: SparkSession, df: DataFrame) -> None:
+    """Generate aggregated Gold tables."""
+
+    # Total revenue per day
+    revenue_by_day = (
+        df.groupBy(col("tpep_pickup_datetime").cast("date").alias("date"))
+        .agg(sum("total_amount").alias("total_revenue"))
+        .orderBy("date")
     )
 
-    try:
-        delta_table = DeltaTable.forPath(spark, PATH)
-        (
-            delta_table.alias("target")
-            .merge(
-                df.alias("source"),
-                "target.tpep_pickup_datetime = source.tpep_pickup_datetime "
-                "AND target.VendorID = source.VendorID "
-                "AND target.tpep_dropoff_datetime = source.tpep_dropoff_datetime",
-            )
-            .whenMatchedUpdateAll()
-            .whenNotMatchedInsertAll()
-            .execute()
-        )
-        logger.info("Silver table has been updated")
+    # Total revenue per vendor
+    revenue_by_vendor = (
+        df.groupBy(col("VendorID"))
+        .agg(sum("total_amount").alias("total"))
+        .orderBy("VendorID")
+    )
 
-    except AnalysisException:
-        (df.write.format("delta").mode("overwrite").partitionBy("month").save(PATH))
-        logger.info("Silver table has been created")
+    # Table 3 : nombre de courses par heure
+    hourly_trips = (
+        df.groupBy(hour("tpep_pickup_datetime").alias("hour"))
+        .agg(count("*").alias("trip_count"))
+        .orderBy("hour")
+    )
 
-    return df
+    _write_delta(revenue_by_day, PATH_REVENUE_BY_DAY)
+    logger.info("Gold table revenue_by_day written")
+
+    _write_delta(revenue_by_vendor, PATH_REVENUE_BY_VENDOR)
+    logger.info("Gold table revenue_by_vendor written")
+
+    _write_delta(hourly_trips, PATH_HOURLY_TRIPS)
+    logger.info("Gold table hourly_trips written")
