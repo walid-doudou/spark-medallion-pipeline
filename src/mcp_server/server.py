@@ -15,7 +15,7 @@ conn.execute("SET s3_url_style='path'")
 
 @mcp.tool()
 def get_hourly_trips() -> str:
-    """Get number of trips per hour of the day"""
+    """Get the number of trips per hour of the day to identify peak hours"""
     result = conn.execute(
         "SELECT * FROM delta_scan('s3://nyc-taxi/gold/hourly_trips')"
     ).df()
@@ -24,7 +24,7 @@ def get_hourly_trips() -> str:
 
 @mcp.tool()
 def get_revenue_by_day() -> str:
-    """Get number of trips per hour of the day"""
+    """Get the total revenue per day"""
     result = conn.execute(
         "SELECT * FROM delta_scan('s3://nyc-taxi/gold/revenue_by_day')"
     ).df()
@@ -33,7 +33,7 @@ def get_revenue_by_day() -> str:
 
 @mcp.tool()
 def get_revenue_by_vendor() -> str:
-    """Get number of trips per hour of the day"""
+    """Get the total revenue per vendor"""
     result = conn.execute(
         "SELECT * FROM delta_scan('s3://nyc-taxi/gold/revenue_by_vendor')"
     ).df()
