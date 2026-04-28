@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import sys
+
+sys.path.insert(0, "/opt/airflow/src")
+
 from datetime import datetime, timedelta
 
 from airflow import DAG
