@@ -8,8 +8,8 @@ def get_spark_session() -> SparkSession:
     return (
         SparkSession.builder.appName("nyc-taxi")  # type: ignore[union-attr]
         .config("spark.driver.host", "localhost")
-        .config("spark.driver.memory", "4g")
-        .config("spark.executor.memory", "4g")
+        .config("spark.driver.memory", "2g")
+        .config("spark.executor.memory", "2g")
         .config("spark.sql.shuffle.partitions", "4")
         .config(
             "spark.jars.packages",
