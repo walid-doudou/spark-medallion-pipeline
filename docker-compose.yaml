@@ -8,6 +8,10 @@ x-airflow-common: &airflow-common
     AIRFLOW__WEBSERVER__SECRET_KEY: "local-dev-secret-key"
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
     PYTHONPATH: /opt/airflow/src
+    AWS_ACCESS_KEY_ID: test
+    AWS_SECRET_ACCESS_KEY: test
+    AWS_DEFAULT_REGION: eu-west-1
+    AWS_ENDPOINT_URL: http://localstack:4566
   volumes:
     - ./dags:/opt/airflow/dags
     - ./src:/opt/airflow/src
