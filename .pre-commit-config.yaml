@@ -9,11 +9,11 @@ repos:
         verbose: true
         pass_filenames: false
         name: format
-        entry: poe linter-fix
+        entry: uv run poe linter-fix
         language: system
       - id: poe-check
         verbose: true
         pass_filenames: false
         name: check
-        entry: poe check
+        entry: uv run poe check
         language: system
