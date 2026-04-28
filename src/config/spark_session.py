@@ -1,7 +1,11 @@
+import os
+
 from pyspark.sql import SparkSession
 
 
 __all__ = ["get_spark_session"]
+
+S3_ENDPOINT = os.getenv("S3_ENDPOINT", "http://localhost:4566")
 
 
 def get_spark_session() -> SparkSession:
@@ -22,7 +26,7 @@ def get_spark_session() -> SparkSession:
             "spark.sql.catalog.spark_catalog",
             "org.apache.spark.sql.delta.catalog.DeltaCatalog",
         )
-        .config("spark.hadoop.fs.s3a.endpoint", "http://localhost:4566")
+        .config("spark.hadoop.fs.s3a.endpoint", S3_ENDPOINT)
         .config("spark.hadoop.fs.s3a.access.key", "test")
         .config("spark.hadoop.fs.s3a.secret.key", "test")
         .config("spark.hadoop.fs.s3a.path.style.access", "true")

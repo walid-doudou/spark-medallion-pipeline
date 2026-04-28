@@ -17,6 +17,7 @@ x-airflow-common: &airflow-common
     AWS_SECRET_ACCESS_KEY: test
     AWS_DEFAULT_REGION: eu-west-1
     AWS_ENDPOINT_URL: http://localstack:4566
+    S3_ENDPOINT: http://localstack:4566
   volumes:
     - ./dags:/opt/airflow/dags
     - ./src:/opt/airflow/src
