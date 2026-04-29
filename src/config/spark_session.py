@@ -19,7 +19,8 @@ def get_spark_session() -> SparkSession:
             "spark.jars.packages",
             "io.delta:delta-spark_2.12:3.1.0,"
             "org.apache.hadoop:hadoop-aws:3.3.4,"
-            "com.amazonaws:aws-java-sdk-bundle:1.12.262",
+            "com.amazonaws:aws-java-sdk-bundle:1.12.262,"
+            "org.postgresql:postgresql:42.7.3",
         )
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
         .config(
