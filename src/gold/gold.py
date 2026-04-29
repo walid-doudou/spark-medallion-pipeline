@@ -1,6 +1,8 @@
 import logging
 import os
 
+from delta.tables import DeltaTable
+from pyspark.errors import AnalysisException
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, count, hour, sum
 
@@ -25,12 +27,28 @@ _JDBC_PROPS = {
 }
 
 
-def _write_delta(df: DataFrame, path: str) -> None:
-    df.write.format("delta").mode("overwrite").save(path)
+def _merge_delta(spark: SparkSession, df: DataFrame, path: str, key_col: str) -> None:
+    try:
+        delta_table = DeltaTable.forPath(spark, path)
+        (
+            delta_table.alias("target")
+            .merge(df.alias("source"), f"target.{key_col} = source.{key_col}")
+            .whenMatchedUpdateAll()
+            .whenNotMatchedInsertAll()
+            .execute()
+        )
+    except AnalysisException:
+        df.write.format("delta").mode("overwrite").save(path)
 
 
-def _write_postgres(df: DataFrame, table: str) -> None:
-    df.write.jdbc(url=_JDBC_URL, table=table, mode="overwrite", properties=_JDBC_PROPS)
+def _upsert_postgres(df: DataFrame, table: str) -> None:
+    # truncate=true avoids DROP TABLE so Metabase never sees the table disappear
+    df.write.jdbc(
+        url=_JDBC_URL,
+        table=table,
+        mode="overwrite",
+        properties={**_JDBC_PROPS, "truncate": "true"},
+    )
 
 
 def gold_run(spark: SparkSession, df: DataFrame) -> None:
@@ -59,16 +77,16 @@ def gold_run(spark: SparkSession, df: DataFrame) -> None:
         .orderBy("hour")
     )
 
-    _write_delta(revenue_by_day, PATH_REVENUE_BY_DAY)
-    _write_postgres(revenue_by_day, "revenue_by_day")
+    _merge_delta(spark, revenue_by_day, PATH_REVENUE_BY_DAY, "date")
+    _upsert_postgres(revenue_by_day, "revenue_by_day")
     logger.info("Gold table revenue_by_day written")
 
-    _write_delta(revenue_by_vendor, PATH_REVENUE_BY_VENDOR)
-    _write_postgres(revenue_by_vendor, "revenue_by_vendor")
+    _merge_delta(spark, revenue_by_vendor, PATH_REVENUE_BY_VENDOR, "VendorID")
+    _upsert_postgres(revenue_by_vendor, "revenue_by_vendor")
     logger.info("Gold table revenue_by_vendor written")
 
-    _write_delta(hourly_trips, PATH_HOURLY_TRIPS)
-    _write_postgres(hourly_trips, "hourly_trips")
+    _merge_delta(spark, hourly_trips, PATH_HOURLY_TRIPS, "hour")
+    _upsert_postgres(hourly_trips, "hourly_trips")
     logger.info("Gold table hourly_trips written")
 
     df.unpersist()
