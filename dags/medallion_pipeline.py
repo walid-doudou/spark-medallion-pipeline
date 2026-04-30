@@ -25,7 +25,7 @@ default_args = {
 
 
 def run_bronze() -> None:
-    from bronze import bronze_run
+    from src import bronze_run
     from config import get_spark_session
 
     spark = get_spark_session()
@@ -46,7 +46,7 @@ def run_bronze_quality() -> None:
 
 def run_silver() -> None:
     from config import get_spark_session
-    from silver import silver_run
+    from src import silver_run
 
     spark = get_spark_session()
     df = spark.read.format("delta").load(BRONZE_PATH)
@@ -66,7 +66,7 @@ def run_silver_quality() -> None:
 
 def run_gold() -> None:
     from config import get_spark_session
-    from gold import gold_run
+    from src import gold_run
 
     spark = get_spark_session()
     df = spark.read.format("delta").load(SILVER_PATH)
