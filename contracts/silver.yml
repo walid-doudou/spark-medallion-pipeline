@@ -1,0 +1,9 @@
+checks for silver_trips:
+  - row_count > 0
+  - missing_count(VendorID) = 0
+  - missing_count(trip_distance) = 0
+  - missing_count(fare_amount) = 0
+  - missing_count(passenger_count) = 0
+  - min(trip_distance) > 0
+  - min(fare_amount) > 0
+  - min(passenger_count) >= 1

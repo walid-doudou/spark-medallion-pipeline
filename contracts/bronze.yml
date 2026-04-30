@@ -1,0 +1,8 @@
+checks for bronze_trips:
+  - row_count > 0
+  - missing_count(VendorID) = 0
+  - missing_count(tpep_pickup_datetime) = 0
+  - missing_count(tpep_dropoff_datetime) = 0
+  - missing_count(year) = 0
+  - missing_count(month) = 0
+  - duplicate_count(tpep_pickup_datetime, VendorID, tpep_dropoff_datetime) = 0

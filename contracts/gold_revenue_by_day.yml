@@ -1,0 +1,5 @@
+checks for revenue_by_day:
+  - row_count > 0
+  - missing_count(date) = 0
+  - missing_count(total_revenue) = 0
+  - min(total_revenue) >= 0
